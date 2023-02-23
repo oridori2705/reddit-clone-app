@@ -10,7 +10,7 @@
 
 import express from "express";
 import morgan from "morgan";
-
+import { AppDataSource } from "./data-source"
 
 const app = express(); //express는 최상위함수니까 app으로 만듦
 
@@ -28,4 +28,10 @@ const port = 3000;
 //app.get을 사용해 api 생성 -> app.get의 url로 접속하면 해당 블록의 코드 실행
 app.get('/', (_, res) => res.send('run'));
 //포트를 지정해주고 app.listen을 실행해주면 express app을 실행해주는 것이다.
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, async ()=> {
+    AppDataSource.initialize().then( () => {
+        console.log("Inserting a new user into the database...")
+
+    }).catch(error => console.log(error))
+
+})
