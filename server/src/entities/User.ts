@@ -1,5 +1,5 @@
-
-/*import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+//여기 만약에 빨간줄 뜨면 tsconfig.json 문제임 
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 
 @Entity()
 export class User {
@@ -16,4 +16,4 @@ export class User {
     @Column()
     age: number
 
-}*/
+}
