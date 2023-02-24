@@ -45,7 +45,7 @@ export default class Sub extends BaseEntity {
     }
 
     @Expose() //배너 이미지의 경로
-    get bannerUrl(): string {
+    get bannerUrl(): string | undefined {
         return this.bannerUrn ? `${process.env.APP_URL}/images/${this.bannerUrn}` :
             undefined;
     }
