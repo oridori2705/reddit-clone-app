@@ -12,7 +12,23 @@ import express from "express";
 import morgan from "morgan";
 import { AppDataSource } from "./data-source"
 
+import authRoutes from "./routes/auth"// auth로 가기위한 경로 지정
+
+import cors from "cors";
+
 const app = express(); //express는 최상위함수니까 app으로 만듦
+
+
+
+const origin ="http://localhost:3000"; //클라이언트의 포트
+
+app.use(
+    cors({
+        origin //여기에 등록을 해주면 받아올 수 있다.
+    })
+);
+
+
 
 
 //app에 express.json과 morgan('dev') 미들웨어를 넣어주는 것 
@@ -23,14 +39,18 @@ app.use(express.json());
 app.use(morgan('dev')); //app에 morgan
 
 
-const port = 3000;
+const port = 4000;
 
 //app.get을 사용해 api 생성 -> app.get의 url로 접속하면 해당 블록의 코드 실행
 app.get('/', (_, res) => res.send('run'));
+//프론트엔드에서 요청을 하면 엔트리 파일인 server.ts로와서 app.use /api/auth를 찾고, auth파일로 가서 register을 찾는 것이다.
+app.use("/api/auth",authRoutes)
+
+
 //포트를 지정해주고 app.listen을 실행해주면 express app을 실행해주는 것이다.
 app.listen(port, async ()=> {
     AppDataSource.initialize().then( () => {
-        console.log("Inserting a new user into the database...")
+        console.log("Inserting a new user into the database...",port)
 
     }).catch(error => console.log(error))
 
