@@ -30,7 +30,7 @@ const Register = () => {
                 username
             })
             console.log('res', res);
-            router.push("/login"); //그리고 login페이지로 이동
+            //router.push("/login"); //그리고 login페이지로 이동
         } catch (error: any) { //error에 타입스크립트 에러가 뜨는데 중요하지 않으므로 any로 지정
             console.log('error', error);
             setErrors(error.response.data || {}); //어떤 에러가 발생하는지
