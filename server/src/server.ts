@@ -16,19 +16,19 @@ import authRoutes from "./routes/auth"// auth로 가기위한 경로 지정
 
 import cors from "cors";
 
+import dotenv from "dotenv" //dotenv를 설치하고 아래의 명령어만 실행하면 서버파일에서도 env 파일 사용가능
+
 const app = express(); //express는 최상위함수니까 app으로 만듦
 
-
+dotenv.config(); //서버에서 .env파일 사용하기 위한 명령어 한줄이면됨
 
 const origin ="http://localhost:3000"; //클라이언트의 포트
-
 app.use(
     cors({
-        origin //여기에 등록을 해주면 받아올 수 있다.
+        origin, //여기에 등록을 해주면 클라이언트를 받아올 수 있다.
+        credentials  :true
     })
 );
-
-
 
 
 //app에 express.json과 morgan('dev') 미들웨어를 넣어주는 것 
@@ -37,6 +37,7 @@ app.use(
 app.use(express.json()); 
 //app.use(morgan('dev')) : morgan은 [dev, short, common, combined] 4가지 모드들이 있는데 개발환경에서는 dev옵션을 사용한다.
 app.use(morgan('dev')); //app에 morgan
+
 
 
 const port = 4000;

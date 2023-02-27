@@ -1,6 +1,10 @@
 import { Request, Response, Router } from "express";
 import { User } from "../entities/User";
-import { validate } from "class-validator";
+import { isEmpty, validate } from "class-validator";
+import bcrypt from "bcryptjs";
+
+import jwt from "jsonwebtoken";
+import cookie from "cookie";
 
 const mapError = (errors: Object[]) => {
   return errors.reduce((prev: any, err: any) => {
@@ -11,6 +15,62 @@ const mapError = (errors: Object[]) => {
     return prev;
   }, {});
 };
+
+const login = async(req: Request, res: Response) =>{
+  const {username,password}= req.body;
+
+  try{
+    let errors: any = {};
+
+    //값이 비워져있다면 에러를 프론트엔드로 보내주기
+    if (isEmpty(username))
+      errors.username = "사용자 이름은 비워둘 수 없습니다.";
+    if (isEmpty(password)) errors.password = "비밀번호는 비워둘 수 없습니다.";
+    if (Object.keys(errors).length > 0) { //위에서 검사한 에러가 들어가 있으면 
+      return res.status(400).json(errors);
+    }
+
+    // 디비에서 유저 찾기
+    const user = await User.findOneBy({ username });
+    if (!user)
+      return res.status(404).json({ username: "사용자 이름이 등록되지 않았습니다." });
+
+    // 유저가 있다면 비밀번호 비교하기, bcrypt로 저장되어있으므로 비교할때도 bcrypt로 한다.
+    const passwordMatches = await bcrypt.compare(password, user.password);
+
+    // 비밀번호가 다르다면 에러 보내기
+    if (!passwordMatches) {
+      return res.status(401).json({ password: "비밀번호가 잘못되었습니다." });
+    }
+
+    //필요한 모듈 설치하기 : npm install jsonwebtoken dotenv cookie --save
+    //모듈들의 타입지정을 위한 설치 : npm i --save-dev @types/jsonwebtoken @types/cookie
+    //jwt 설치하기 :  jsonwebtoken
+    //환경변수 파일 설치하기(프론트엔드는 react-create-app으로 자동생성됨) :dotenv
+    //쿠키모듈 설치하기 : cookie
+    // 비밀번호가 맞다면 토큰 생성,jwt의 sign 메소드로 토큰생성이 가능 ,username을 넣고 + 비밀문장(환경변수로함)을 넣는다.
+    //환경변수 파일(.env)는 모듈 설치 후 server.ts에 모듈 import 후 dotenv.config(); 하면 env파일 사용가능하다.
+    const token = jwt.sign({ username },process.env.JWT_SECRET!); 
+    // process.env.JWT_SECRET! : 이것은 컴파일러에게 "개발자로서 이 변수가 지금은 undefined나 null이 될 수 없다는 것을 컴파일러보다 잘 알고 있습니다." 라고 말하는 것 ->오류 제거
+
+    // 쿠키저장
+    // var setCookie = cookie.serialize("foo","var");
+    //쿠키 저장을 위해 위에서 credential : true를 했다.
+    //원래는 쿠키로 저장 못한다.
+    res.set("Set-Cookie",cookie.serialize("token", token,
+    {httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",})
+    );
+    //user랑 토큰을 요청을 보내온곳에 다시 보내준다.
+    console.log(res)
+    return res.json({ user, token });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
+  }
+
 
 
 const register = async (req: Request, res: Response) => {//Request,Response 타입은 express에서 가져옴 
@@ -59,5 +119,5 @@ const register = async (req: Request, res: Response) => {//Request,Response 타�
 
 const router = Router();
 router.post("/register", register); // "/register" 경로에 post로 요청이 올 떄 register 핸들러를를 실행한다.
-
+router.post("/login",login)
 export default router;
