@@ -12,7 +12,10 @@ import express from "express";
 import morgan from "morgan";
 import { AppDataSource } from "./data-source"
 
+
 import authRoutes from "./routes/auth"// auth로 가기위한 경로 지정
+
+import subRoutes from "./routes/subs"
 
 import cors from "cors";
 
@@ -47,6 +50,7 @@ app.get('/', (_, res) => res.send('run'));
 //프론트엔드에서 요청을 하면 엔트리 파일인 server.ts로와서 app.use /api/auth를 찾고, auth파일로 가서 register을 찾는 것이다.
 app.use("/api/auth",authRoutes)
 
+app.use("/api/subs",subRoutes)
 
 //포트를 지정해주고 app.listen을 실행해주면 express app을 실행해주는 것이다.
 app.listen(port, async ()=> {
