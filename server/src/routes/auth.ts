@@ -17,7 +17,7 @@ const mapError = (errors: Object[]) => {
 };
 
 const login = async(req: Request, res: Response) =>{
-  const {username,password}= req.body;
+  const {username,password}= req.body; 
 
   try{
     let errors: any = {};
@@ -57,11 +57,14 @@ const login = async(req: Request, res: Response) =>{
     // var setCookie = cookie.serialize("foo","var");
     //쿠키 저장을 위해 위에서 credential : true를 했다.
     //원래는 쿠키로 저장 못한다.
+    //{httpOnly: true,maxAge: 60 * 60 * 24 * 7,path: "/",} : 이 쿠키옵션이 없으면 application탭의 cookie에는 토큰이 저장안된다, 
+    //-> response의 헤더에는 Set-cookie라는 이름으로 토큰이 저장되어있음
     res.set("Set-Cookie",cookie.serialize("token", token,
-    {httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",})
-    );
+    {httpOnly: true, //httpOnly 옵션이 설정된 쿠키는 document.cookie로 쿠키 정보를 읽을 수 없기 때문에 쿠키를 보호할 수 있습니다.
+      maxAge: 60 * 60 * 24 * 7, //1주일
+      path: "/" // 이 경로나 이 경로의 하위 경로에 있는 페이지만 쿠키에 접근할 수 있습니다. 절대 경로이어야 하고, (미 지정시) 기본값은 현재 경로입니다.
+    })); //특별한 경우가 아니라면, path 옵션을 path=/ 같이 루트로 설정해 웹사이트의 모든 페이지에서 쿠키에 접근할 수 있도록 합시다.
+    
     //user랑 토큰을 요청을 보내온곳에 다시 보내준다.
     console.log(res)
     return res.json({ user, token });

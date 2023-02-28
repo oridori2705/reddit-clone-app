@@ -3,12 +3,15 @@ import { useRouter } from 'next/router';
 import React, { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import  Axios  from 'axios';
+import { useAuthDispatch } from '@/context/auth';
 
 const login = () => {
     let router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<any>({});
+
+    const dispatch = useAuthDispatch();//context의 업데이트를 사용하기 위해 auth.tsx에서 가져옴
 
     const handleSubmit =async (event : FormEvent)=>{
         event.preventDefault();
@@ -20,6 +23,10 @@ const login = () => {
         try {
             const res = await Axios.post("/auth/login",{password,username},{withCredentials : true}); 
             
+            //백엔드에서 보내준 유저정보를 다른 컴포넌트에서 사용하기 위해 context에 보관하기
+            dispatch("LOGIN",res.data?.user);
+            //로그인하면 메인페이지로
+            router.push("/");
         } catch (error :any) {
             console.error(error);
             setErrors(error?.response?.data || {})
