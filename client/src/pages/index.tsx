@@ -1,8 +1,21 @@
+import { Sub } from "@/types";
+import axios from "axios";
 import Link from "next/link";
-
+import useSWR from "swr";
 
  
 export default function Home() {
+
+  //swr을 위한 fetcher와 address 지정
+    //address가 fetcher의 url에 지정 -> axios요청 -> 반환된 값은 swr의 topSubs로
+    const fetcher = async (url: string) => {
+      return await axios.get(url).then(res => res.data)//여기서 반환된 res는 아래에 topSubs로 간다
+    }
+    const address = `/subs/sub/topSubs`;
+
+  //커뮤니티리스트를 가져오기위한 SWR 사용 - 모듈설치해야함
+    const { data: topSubs } = useSWR<Sub[]>(address, fetcher)
+
   return (
     <div className='flex max-w-5xl px-4 pt-5 mx-auto'>
       ddd
