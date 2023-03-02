@@ -30,7 +30,7 @@ const origin ="http://localhost:3000"; //클라이언트의 포트
 app.use(
     cors({
         origin, //여기에 등록을 해주면 클라이언트를 받아올 수 있다.
-        credentials  :true
+        credentials : true
     })
 );
 

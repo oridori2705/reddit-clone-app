@@ -5,6 +5,30 @@ import { isEmpty } from "class-validator";
 import { AppDataSource } from "../data-source";
 import Sub from "../entities/Sub";
 import { User } from "../entities/User";
+import Post from "../entities/Post";
+
+
+//메인페이지에서 상위 커뮤니티 리스트를 보여주기위해 -> typeORM 사용부분이다.
+const topSubs = async (req: Request, res: Response) => {
+  try {
+    // COALESCE : 만약에 "imageUrn" 부분이 없으면 뒤에 'https://www.gravatar.com/avatar?d=mp&f=y' 이걸로 가져온다. -> 기본이미지로 보여준다.
+    const imageUrlExp = `COALESCE('${process.env.APP_URL}/images/' ||s."imageUrn",'https://www.gravatar.com/avatar?d=mp&f=y')`;
+    const subs = await AppDataSource.createQueryBuilder()
+      .select(// 2. title, name, imageUrl, postcount를 가져온다.
+        `s.title, s.name, ${imageUrlExp} as "imageUrl", count(p.id) as "postCount"`
+      )
+      .from(Sub, "s")//1. Sub테이블에서 가져온다.
+      .leftJoin(Post, "p", `s.name = p."subName"`) //Sub의 name과 Post의 subname 같은 것을 join해서 위의 count(p.id)을 표현
+      .groupBy('s.title, s.name, "imageUrl"')
+      .orderBy(`"postCount"`, "DESC") // postcount 많은 순서대로
+      .limit(5)//5개만 가져온다
+      .execute();
+    return res.json(subs);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "문제가 발생했습니다." });
+  }
+};
 
 const createSub = async (req: Request, res: Response, next:NextFunction) => {
     const { name, title, description } = req.body;
@@ -52,5 +76,6 @@ const createSub = async (req: Request, res: Response, next:NextFunction) => {
 const router = Router();
 //router을 통해 user 과 auth미들웨어를 통과한 이후에 createsub를 수행한다.
 router.post("/",userMiddleware,authMiddleware,createSub);
-
+//상위 커뮤니티 리스트를 보여주기위한 핸들러
+router.get("/sub/topSubs", topSubs);
 export default router;

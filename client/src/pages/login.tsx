@@ -5,7 +5,7 @@ import Link from 'next/link'
 import  Axios  from 'axios';
 import { useAuthDispatch,useAuthState } from '@/context/auth';
 
-const login = () => {
+const Login = () => {
     let router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -73,4 +73,4 @@ const login = () => {
     )
 }
 
-export default login
+export default Login

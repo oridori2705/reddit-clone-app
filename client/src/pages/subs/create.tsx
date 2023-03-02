@@ -1,10 +1,10 @@
+import { Sub } from "@/types";
 import axios from "axios";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
+import useSWR from "swr";
 import InputGroup from "../../components/InputGroup"
-
-
 
 const SubCreate = () => {
     const [name, setName] = useState("");
@@ -13,6 +13,21 @@ const SubCreate = () => {
     const [errors, setErrors] = useState<any>({});
     
     let router = useRouter();
+
+    //swr을 위한 fetcher와 address 지정
+    //address가 fetcher의 url에 지정 -> axios요청 -> 반환된 값은 swr의 topSubs로
+    const fetcher = async (url: string) => {
+        return await axios.get(url).then(res => res.data)//여기서 반환된 res는 아래에 topSubs로 간다
+      }
+      const address = `/subs/sub/topSubs`;
+
+    //커뮤니티리스트를 가져오기위한 SWR 사용 - 모듈설치해야함
+    const { data: topSubs } = useSWR<Sub[]>(address, fetcher)
+
+
+
+
+
 
     //커뮤니티 생성
     const handleSubmit = async (event: FormEvent) => {
@@ -98,7 +113,9 @@ export default SubCreate;
 //5. user미들웨어 인증이 끝나면 인증이 끝난 유저정보를 auth미들웨어에서 저장된 유저정보를 검증한다(관리자인지 뭐 그런거)
 //6. auth미들웨어 인증이 끝나면 me 핸들러로 가서 모든 인증이 끝난 유저정보를 클라이언트에 보내준다.
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+    
     try {
+        
         const cookie = req.headers.cookie;
         // 쿠키가 없다면 에러를 보내기
         if (!cookie) throw new Error("Missing auth token cookie");
@@ -114,7 +131,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     } catch (error) {
         // 백엔드에서 요청에서 던져준 쿠키를 이용해 인증 처리할 때 에러가 나면 /login 페이지로 이동
         //307에러 : 임시적으로 url을 옮겨줌
-        res.writeHead(307, { Location: "/login" }).end()
+        console.log(error)
+        res.writeHead(307, { Location: "../login" }).end();
+
         return { props: {} };
     }
 }

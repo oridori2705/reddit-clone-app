@@ -13,15 +13,15 @@ export default async(req:Request, res:Response, next : NextFunction)=>{
 
         const user = await User.findOneBy({username});//username을 이용해 해당 유저가 실제 있는 유저인지 확인한다.
 
-        if(!user) throw new Error("Unauthenticated"); //없으면 인증 안됨
+        if(!user) throw new Error("아이디없음"); //없으면 인증 안됨
 
         //유저 정보를 res.local.user에 넣어주기 -> 그러면 언제든지 user정보를 res를 이용해서 user정보를 받을 수 있음
         res.locals.user=user;
-        console.log(user);
+        console.log("==="+user);
         return next();
     } catch (error) {
         console.log(error);
-        return res.status(401).json({error: "Unauthenticated"}); //프론트로 에러 보내줌
+        return res.status(401).json({error: "서버에러 : Unauthenticated"}); //프론트로 에러 보내줌
     }
     
 }
