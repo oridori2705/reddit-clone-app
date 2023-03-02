@@ -75,6 +75,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
                 const res = await axios.get("/auth/me"); //로그인된 사람만 커뮤니티 생성페이지 들어갈수 있게하는 로직을 여기서도 이용
                 dispatch("LOGIN", res.data);// 로그인이 되어있으면 context 정보 업데이트
+                
             } catch (error) {
                 console.log(error)
             } finally {

@@ -9,7 +9,7 @@ export default async(req:Request, res:Response, next : NextFunction)=>{
         const token =req.cookies.token; //토큰 받아주기
         if(!token) return next(); //없으면 넘겨버리기
 
-        const {username} : any =jwt.verify(token, process.env.JWT_TOKEN!);//token에서 username을 추출한다.
+        const {username} : any =jwt.verify(token, process.env.JWT_SECRET!);//token에서 username을 추출한다.
 
         const user = await User.findOneBy({username});//username을 이용해 해당 유저가 실제 있는 유저인지 확인한다.
 
@@ -18,6 +18,7 @@ export default async(req:Request, res:Response, next : NextFunction)=>{
         //유저 정보를 res.local.user에 넣어주기 -> 그러면 언제든지 user정보를 res를 이용해서 user정보를 받을 수 있음
         res.locals.user=user;
         console.log(user);
+        return next();
     } catch (error) {
         console.log(error);
         return res.status(401).json({error: "Unauthenticated"}); //프론트로 에러 보내줌

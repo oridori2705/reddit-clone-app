@@ -106,7 +106,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
         // 쿠키가 있다면 그 쿠키를 이용해서 백엔드에서 인증 처리하기 (subs)
         //axios.get 데이터 조회
         //{ headers: { cookie } } 
-        await axios.get(`${process.env.NEXT_PUBLIC_SERVER_BASE_URL}/api/auth/me`,
+        await axios.get("/auth/me",
             { headers: { cookie } })//헤더에 쿠키를 넣어서 요청을 보냄(user.ts랑 auth.ts 때문에)
 
         return { props: {} }
