@@ -1,3 +1,4 @@
+import { useAuthState } from '@/context/auth';
 import axios from 'axios'; //axios 설치
 import Link from 'next/link'
 import { useRouter } from 'next/router';
@@ -14,9 +15,13 @@ const Register = () => {
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<any>({}); //error는 객체
 
+    //로그인된 유저는 못들어오도록 context의 로그인인증상태를 가져온다.
+    const { authenticated } = useAuthState();
     
     let router = useRouter();//NextJs에서 제공해주는 Router
 
+    //로그인되어있으면 메인페이지로 돌아가게한다/
+    if (authenticated) router.push("/");
 
     //백엔드에 회원가입을 위한 요청 및 회원가입 후 로그인 페이지로 자동 이동
     const handleSubmit = async (event: FormEvent) => { //event 타입 formevent

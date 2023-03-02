@@ -69,19 +69,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         defaultDispatch({ type, payload });
     }
 
-    /*useEffect(() => {
-        async function loadUser() {
+    //로그인 후에는 로그인페이지나 회원가입 페이지에 들어가도 다시 메인페이지로 돌아오게 만들기
+    useEffect(() => {
+        async function loadUser() { //컴포넌트 시작하자마자 해당 함수실행
             try {
-                const res = await axios.get("/auth/me");
-                dispatch("LOGIN", res.data);
+                const res = await axios.get("/auth/me"); //로그인된 사람만 커뮤니티 생성페이지 들어갈수 있게하는 로직을 여기서도 이용
+                dispatch("LOGIN", res.data);// 로그인이 되어있으면 context 정보 업데이트
             } catch (error) {
                 console.log(error)
             } finally {
-                dispatch("STOP_LOADING");
+                dispatch("STOP_LOADING"); //Stop loading은 결국 실행되는 것, loading을 false로 함
             }
         }
         loadUser();
-    }, [])*/
+    }, [])
 
     //context를 사용하기 위해 컴포넌트를 아래와 같이 감싸준다.
     return (
@@ -95,5 +96,5 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 //다른 컴포넌트에서 쉽게 사용할 수 있게 export한다.
 //다른 컴포넌트에서는 const dispatch = useAuthDispatch(); 와 같이 선언하고
 //dispatch
-export const useAuthState = () => useContext(StateContext);
-export const useAuthDispatch = () => useContext(DispatchContext);
+export const useAuthState = () => useContext(StateContext); //context의 현재 상태를 내보냄
+export const useAuthDispatch = () => useContext(DispatchContext); //context의 상태를 업데이트함

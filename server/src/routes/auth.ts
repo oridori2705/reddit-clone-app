@@ -129,7 +129,7 @@ const register = async (req: Request, res: Response) => {//Request,Response 타�
 //커뮤니티생성시 로그인이 안되어있으면 접근을 못하게하고 만약 로그인이 되어있으면 여기로 온다.
 //req 는 안쓰니까 _ 로 해줌
 const me= async (_: Request, res: Response) => {
-  return res.json(res.locals.user);
+  return res.json(res.locals.user);  //res.locals.user는 user미들웨어에서 넣어준 값이다 이걸 프론트엔드에 보내준다.
 }
 
 

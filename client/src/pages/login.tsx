@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React, { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import  Axios  from 'axios';
-import { useAuthDispatch } from '@/context/auth';
+import { useAuthDispatch,useAuthState } from '@/context/auth';
 
 const login = () => {
     let router = useRouter();
@@ -11,7 +11,13 @@ const login = () => {
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<any>({});
 
+    //로그인된 사람은  로그인페이지에 못들어오게하는 state
+    const { authenticated } = useAuthState()
+
     const dispatch = useAuthDispatch();//context의 업데이트를 사용하기 위해 auth.tsx에서 가져옴
+    
+    //context의 인증의 상태를 가져와서 만약 로그인이 되어있으면 메인페이지로 돌아가기
+    if (authenticated) router.push("/");
 
     const handleSubmit =async (event : FormEvent)=>{
         event.preventDefault();
