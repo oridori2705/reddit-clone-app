@@ -1,4 +1,5 @@
 import axios from "axios";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import InputGroup from "../../components/InputGroup"
@@ -88,3 +89,32 @@ const SubCreate = () => {
 
 export default SubCreate;
 
+//로그인이 안된사람이 커뮤니티 생성하는 페이지를 아예 접근할 수 없게
+//getServerSideProps는 빌드와 상관없이, 매 페이지 요청마다 데이터를 서버로부터 가져옵니다.
+//1. 먼저 커뮤니티 생성 페이지에 들어오면 아래를 수행한다.
+//2. 쿠키가없으면 에러
+//3. axios로 auth/me 수행 -> auth/me 가면 user미들웨어, auth미들웨어를 수행한다.
+//4.axios.get에서 넘겨주었던 쿠키를 이용해 user미들웨어에서 유저정보를 검증한다(해당 유저가 있는지 없는지)
+//5. user미들웨어 인증이 끝나면 인증이 끝난 유저정보를 auth미들웨어에서 저장된 유저정보를 검증한다(관리자인지 뭐 그런거)
+//6. auth미들웨어 인증이 끝나면 me 핸들러로 가서 모든 인증이 끝난 유저정보를 클라이언트에 보내준다.
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+    try {
+        const cookie = req.headers.cookie;
+        // 쿠키가 없다면 에러를 보내기
+        if (!cookie) throw new Error("Missing auth token cookie");
+
+        // 쿠키가 있다면 그 쿠키를 이용해서 백엔드에서 인증 처리하기 (subs)
+        //axios.get 데이터 조회
+        //{ headers: { cookie } } 
+        await axios.get(`${process.env.NEXT_PUBLIC_SERVER_BASE_URL}/api/auth/me`,
+            { headers: { cookie } })//헤더에 쿠키를 넣어서 요청을 보냄(user.ts랑 auth.ts 때문에)
+
+        return { props: {} }
+
+    } catch (error) {
+        // 백엔드에서 요청에서 던져준 쿠키를 이용해 인증 처리할 때 에러가 나면 /login 페이지로 이동
+        //307에러 : 임시적으로 url을 옮겨줌
+        res.writeHead(307, { Location: "/login" }).end()
+        return { props: {} };
+    }
+}

@@ -6,6 +6,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cookie from "cookie";
 
+import userMiddleware from "../middlewares/user";
+import authMiddleware from "../middlewares/auth";
+
 const mapError = (errors: Object[]) => {
   return errors.reduce((prev: any, err: any) => {
     //Object.entries(err.constraints); : [ "isEmail","이메일 주소가 잘못되었습니다."]
@@ -16,6 +19,9 @@ const mapError = (errors: Object[]) => {
   }, {});
 };
 
+
+
+//login
 const login = async(req: Request, res: Response) =>{
   const {username,password}= req.body; 
 
@@ -120,7 +126,15 @@ const register = async (req: Request, res: Response) => {//Request,Response 타�
       }
 };
 
+//커뮤니티생성시 로그인이 안되어있으면 접근을 못하게하고 만약 로그인이 되어있으면 여기로 온다.
+//req 는 안쓰니까 _ 로 해줌
+const me= async (_: Request, res: Response) => {
+  return res.json(res.locals.user);
+}
+
+
 const router = Router();
+router.get("/me",userMiddleware,authMiddleware,me);
 router.post("/register", register); // "/register" 경로에 post로 요청이 올 떄 register 핸들러를를 실행한다.
 router.post("/login",login)
 export default router;
