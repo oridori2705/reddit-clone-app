@@ -9,9 +9,10 @@ const NavBar: React.FC = () => {
     
     const dispatch = useAuthDispatch();
 
+    //로그아웃 함수
     const handleLogout = () => {
-        axios.post("/auth/logout")
-            .then(() => {
+        axios.post("/auth/logout") //백엔드에 요청을 보내 cookie를 없애야한다.
+            .then(() => { //결과값이오면 context의 state를 업데이트 해줘야한다.
                 dispatch("LOGOUT");
                 window.location.reload();
             })

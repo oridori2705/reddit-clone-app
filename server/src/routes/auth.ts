@@ -19,7 +19,20 @@ const mapError = (errors: Object[]) => {
   }, {});
 };
 
-
+//로그아웃
+const logout = async (_: Request, res: Response) => {
+  res.set(
+    "Set-Cookie",
+    cookie.serialize("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      expires: new Date(0), //expires를 0으로 줘서 유효기간을 아예없어버리면 쿠키가 없어진다.
+      path: "/",
+    })
+  );
+  res.status(200).json({ success: true });
+};
 
 //login
 const login = async(req: Request, res: Response) =>{
@@ -137,4 +150,5 @@ const router = Router();
 router.get("/me",userMiddleware,authMiddleware,me);
 router.post("/register", register); // "/register" 경로에 post로 요청이 올 떄 register 핸들러를를 실행한다.
 router.post("/login",login)
+router.post("/logout", userMiddleware, authMiddleware, logout); //로그아웃할 사람인지 검사하기위해 user,auth미들웨어 수행
 export default router;

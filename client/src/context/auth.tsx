@@ -38,8 +38,8 @@ const reducer = (state: State, { type, payload }: Action) => {
         case "LOGOUT":
             return {
                 ...state,
-                authenticated: false,
-                user: null
+                authenticated: false, //인증은 false로
+                user: null //유저정보는 없애서 로그아웃
             }
         case "STOP_LOADING":
             return {
