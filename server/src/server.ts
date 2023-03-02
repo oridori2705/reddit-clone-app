@@ -20,6 +20,7 @@ import subRoutes from "./routes/subs"
 import cors from "cors";
 
 import dotenv from "dotenv" //dotenv를 설치하고 아래의 명령어만 실행하면 서버파일에서도 env 파일 사용가능
+import cookieParser from "cookie-parser";
 
 const app = express(); //express는 최상위함수니까 app으로 만듦
 
@@ -41,7 +42,9 @@ app.use(express.json());
 //app.use(morgan('dev')) : morgan은 [dev, short, common, combined] 4가지 모드들이 있는데 개발환경에서는 dev옵션을 사용한다.
 app.use(morgan('dev')); //app에 morgan
 
-
+//클라이언트에서 요청을 보낼때 쿠키를 보낸다. 하지만 서버에서 받아도 쿠키를 받을 수 없다.
+//분석을 하고 받아야하므로 cookie-parser을 설치하고 넣어준다.
+app.use(cookieParser());
 
 const port = 4000;
 
