@@ -6,7 +6,7 @@ import { User } from "../entities/User";
 export default async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user: User | undefined = res.locals.user; //받아온 user
-
+    console.log(user);
     if (!user) throw new Error("인증 오류 :Unauthenticated");  //user가 없으면 인증안됨
 
     return next();
