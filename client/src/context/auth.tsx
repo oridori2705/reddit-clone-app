@@ -14,7 +14,7 @@ interface State {
 const StateContext = createContext<State>({
     authenticated: false, //유저가 인증이 됐는지 안됐는지
     user: undefined, //유저정보 처음에는 undefined
-    loading: true //인증을 하고있는지 아닌지
+    loading: true //인증을 하고있는지 아닌지,autenticated가 하고 있는 중인지 아닌지
 });
 
 //유저의 정보를 업데이트하거나 인증 유무를 업데이트하는 것을 구현
