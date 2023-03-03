@@ -7,6 +7,31 @@ import Sub from "../entities/Sub";
 import { User } from "../entities/User";
 import Post from "../entities/Post";
 
+//커뮤니티 상세 리스트 가져오기
+const getSub = async (req: Request, res: Response) => {
+  const name = req.params.name;
+  try {
+    const sub = await Sub.findOneByOrFail({ name });
+
+    // 포스트를 생성한 후에 해당 sub에 속하는 포스트 정보들을 넣어주기
+    const posts = await Post.find({
+      where: { subName: sub.name },
+      order: { createdAt: "DESC" },
+      relations: ["comments", "votes"],
+    });
+
+    sub.posts = posts;
+
+    if (res.locals.user) {
+      sub.posts.forEach((p) => p.setUserVote(res.locals.user));
+    }
+
+    return res.json(sub);
+  } catch (error) {
+    return res.status(404).json({ error: "커뮤니티를 찾을 수 없습니다." });
+  }
+};
+
 
 //메인페이지에서 상위 커뮤니티 리스트를 보여주기위해 -> typeORM 사용부분이다.
 const topSubs = async (req: Request, res: Response) => {
@@ -78,4 +103,6 @@ const router = Router();
 router.post("/",userMiddleware,authMiddleware,createSub);
 //상위 커뮤니티 리스트를 보여주기위한 핸들러
 router.get("/sub/topSubs", topSubs);
+//커뮤니스 상세 리스트 가져오는 핸들러, 아래 이름을 이용해 해당 커뮤니티글 을 가져온다.
+router.get("/:name", userMiddleware, getSub);
 export default router;

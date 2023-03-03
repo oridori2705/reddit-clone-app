@@ -18,7 +18,7 @@ const SubPage = () => {
        
     }
     const router = useRouter();
-    const subName = router.query.sub;
+    const subName = router.query.sub; //요청을 불러올 주소를 저장,sub은 현재 [sub].tsx로 했기 때문에 sub으로 들어옴, 만약 커뮤니티 이름이 test2면 test2를 가져옴
     const { data: sub, error} = useSWR(subName ? `/subs/${subName}` : null,fetcher);
     return (
         <>
