@@ -62,7 +62,7 @@ export default function Home() {
 
         </div>
         
-        <div className='w-full py-6 text-center'>
+        
         {authenticated &&
             <div className='w-full py-6 text-center'>
               <Link href="/subs/create">
@@ -72,7 +72,7 @@ export default function Home() {
               </Link>
             </div>
           }
-        </div>
+        
         
       </div>
     </div>
