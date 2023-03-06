@@ -1,14 +1,10 @@
 import SideBar from '@/components/SideBar';
 import axios from 'axios'
 import Image from 'next/image';
-// import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
-// import PostCard from '../../components/PostCard';
-// import SideBar from '../../components/SideBar';
 import { useAuthState } from '../../context/auth';
-// import { Post } from '../../types';
 
 const SubPage = () => {
     const [ownSub, setOwnSub] = useState(false);//현재 사용자가 커뮤니티 주인인지 확인하기위해
@@ -17,21 +13,12 @@ const SubPage = () => {
     const fileInputRef = useRef<HTMLInputElement>(null); // useRef 사용을 위해 변수 선언
     
     
-    const fetcher = async(url: string)=>{
-        try {
-            const res = await axios.get(url);
-            return res.data;
-            
-        } catch (error) {
-            console.log(error);
-        }
-       
-    }
+    
     const router = useRouter();
     const subName = router.query.sub; //요청을 불러올 주소를 현재 라우터를 통해 저장,sub은 현재 url 이름, 만약 커뮤니티 이름이 test2면 test2를 가져옴
-    const { data: sub, error} = useSWR(subName ? `/subs/${subName}` : null,fetcher); //useSWR을 통해 서버에 데이터 요청
+    const { data: sub} = useSWR(subName ? `/subs/${subName}` : null); //useSWR을 통해 서버에 데이터 요청,fetcher 없앰 _app.tsx에 선언
     
-    //
+    
     useEffect(() => {
         if (!sub || !user) return; //sub과 user가 없는 경우에는 못들어옴 -> sub이 없으면 만든 사람 정보를 못가져옴 user또한 마찬가지 -> context에서 user를 User || undefined 유니언state로 했기 때문에 !user를 해줘야한다.
         setOwnSub(authenticated && user.username === sub.username); // 로그인이 되어있고 && 현재  사용자와 커뮤니티 주인이 같으면 OwnSun true 설정

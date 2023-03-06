@@ -7,6 +7,30 @@ import authMiddleware from "../middlewares/auth";
 import Post from "../entities/Post";
 import Sub from "../entities/Sub";
 
+//현재 클릭한 post가져오는 라우터
+const getPost = async (req: Request, res: Response) => {
+  //indentifier는 Post엔티티에서 무작위로 만들어주는 데이터이다. (helper.ts의 함수를 이용한다.)
+  //slug또한 글의 title을 helper.ts에서 유효성검사 후 데이터로 넣어준다.
+  const { identifier, slug } = req.params; //indentifier 폴더이름과 slug이름을 가져온다.
+  try {
+    const post = await Post.findOneOrFail({
+      where: { identifier, slug },//identifier과 slug를 이용해서 post정보를 찾는다.
+      relations: ["sub", "votes"], //join 을해서 관련된 sub정보와 votes정보를 가져오는것
+    });
+
+    //Post 엔티티에 있는 setUserVote에 현재 유저를 할당
+    if (res.locals.user) {
+      post.setUserVote(res.locals.user);
+    }
+
+    return res.send(post);
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({ error: "게시물을 찾을 수 없습니다." });
+  }
+};
+
+
 const createPost = async (req: Request, res: Response) => { 
     const { title, body, sub } = req.body; //클라이언트에서 포스트submit버튼으로 보내준 것들
     if (title.trim() === "") {
@@ -36,5 +60,6 @@ const createPost = async (req: Request, res: Response) => {
 const router = Router();
 //post생성 라우터
 router.post("/",userMiddleware,authMiddleware, createPost);
-
+//현재 클릭한 post정보를 가져오는 라우터
+router.get("/:identifier/:slug", userMiddleware, getPost);
 export default router; //이것도 항상 routes의 기능 만들 때 작성

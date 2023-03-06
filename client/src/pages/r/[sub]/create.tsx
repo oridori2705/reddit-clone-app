@@ -9,17 +9,18 @@ const PostCreate = () => {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const router = useRouter();
-    const { sub: subName } = router.query;
+    const { sub: subName } = router.query;  //router.query를 이용해 현재 커뮤니티 이름을 가져옴
+    console.log(router.query);
     //포스트 생성버튼 누르면
     const submitPost = async (e: FormEvent) => {
         e.preventDefault();
         if (title.trim() === "" || !subName) return; //title이나 sub이없으면 반환
 
         try {
-            const { data: post } = await axios.post<Post>("/posts", {
-                title: title.trim(),
-                body,
-                sub: subName
+            const { data: post } = await axios.post<Post>("/posts", { //routes/posts 로 서버에 요청보내기
+                title: title.trim(), //양쪽공백을 제거하고 값을 넣음
+                body, //본문
+                sub: subName //현재 커뮤니티 이름
             })
             //{post.identifier} , {post.slug} 위 data : post를 이용
             router.push(`/r/${subName}/${post.identifier}/${post.slug}`)
