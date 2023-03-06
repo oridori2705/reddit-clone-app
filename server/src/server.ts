@@ -46,6 +46,12 @@ app.use(morgan('dev')); //app에 morgan
 //분석을 하고 받아야하므로 cookie-parser을 설치하고 넣어준다.
 app.use(cookieParser());
 
+//커뮤니티 상세페이지의 배너에 이미지 업로드시 이미지가 안뜨는 오류 해결
+//정적파일이 public안에 있고 브라우저로 접근할 때 제공할 수 있게 해준다.
+//static파일이 public안에 있다고 알려줌
+app.use(express.static("public"));
+
+
 const port = 4000;
 
 //app.get을 사용해 api 생성 -> app.get의 url로 접속하면 해당 블록의 코드 실행

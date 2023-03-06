@@ -38,7 +38,7 @@ export default class Sub extends BaseEntity {
     @OneToMany(() => Post, (post) => post.sub) //posts는 Community안의 포스트들을 의미
     posts: Post[]
     //원래는 데이터만 JSON으로 보낸 다음에 imageURL을 거기서 생성할 수 있지만 여기서 깔끔하게 했다.
-    @Expose() //Expose : class-TransFormer을 이용해 사용 sub.imageUrl하면 해당 이미지를 가져올 수 있음 -> 클래스형태라서(JSON이면 안됨)
+    @Expose() //Expose : class-TransFormer을 이용해 사용, 클래스로 프론트엔드에 보내기 때문에 sub.imageUrl하면 해당 이미지를 가져올 수 있음 -> 클래스형태라서 가능(JSON이면 안된다.)
     get imageUrl(): string {//process.env.APP_URL : 로컬 호스트 4000번 URL을 일단 환경변수로 변경함
         return this.imageUrn ? `${process.env.APP_URL}/images/${this.imageUrn}` : 
             "https://www.gravatar.com/avatar?d=mp&f=y" //gravatar은 그냥 기본 아이콘 이미지
