@@ -1,3 +1,4 @@
+import SideBar from '@/components/SideBar';
 import axios from 'axios'
 import Image from 'next/image';
 // import Link from 'next/link';
@@ -136,7 +137,9 @@ const SubPage = () => {
                     </div>
                     {/* 포스트와 사이드바 */}
                     <div className='flex max-w-5xl px-4 pt-5 mx-auto'>
-                        
+                        <div className='w-full md:mr-3 md:w-8/12'>
+                            <SideBar sub={sub}/>                    
+                        </div>
                     </div>
                 </>
             }
