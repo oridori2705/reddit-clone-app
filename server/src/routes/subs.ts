@@ -19,14 +19,16 @@ const getSub = async (req: Request, res: Response) => {
 
 
     // 포스트를 생성한 후에 해당 sub에 속하는 포스트 정보들을 넣어주기
-    const posts = await Post.find({
-      where: { subName: sub.name },
-      order: { createdAt: "DESC" },
-      relations: ["comments", "votes"],
+    // 커뮤니티 상세 페이지에서 post/create에서 작성돼 있는 post들을 가져와야한다.
+    const posts = await Post.find({//모두 찾아야하니까 find
+      where: { subName: sub.name },//해당하는 커뮤니티를 찾음
+      order: { createdAt: "DESC" },//순서대로
+      relations: ["comments", "votes"],//relatuon : 
     });
 
-    sub.posts = posts;
+    sub.posts = posts; //sub Entity의 post정보를 넣음
 
+    //투표 부분
     if (res.locals.user) {
       sub.posts.forEach((p) => p.setUserVote(res.locals.user));
     }

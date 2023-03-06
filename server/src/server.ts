@@ -22,6 +22,9 @@ import cors from "cors";
 import dotenv from "dotenv" //dotenv를 설치하고 아래의 명령어만 실행하면 서버파일에서도 env 파일 사용가능
 import cookieParser from "cookie-parser";
 
+import postsRoutes from "./routes/posts"//포스트 작성 routes
+
+
 const app = express(); //express는 최상위함수니까 app으로 만듦
 
 dotenv.config(); //서버에서 .env파일 사용하기 위한 명령어 한줄이면됨
@@ -60,6 +63,8 @@ app.get('/', (_, res) => res.send('run'));
 app.use("/api/auth",authRoutes)
 
 app.use("/api/subs",subRoutes)
+
+app.use("/api/posts",postsRoutes)//post작성 routes
 
 //포트를 지정해주고 app.listen을 실행해주면 express app을 실행해주는 것이다.
 app.listen(port, async ()=> {
