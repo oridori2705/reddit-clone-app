@@ -84,6 +84,29 @@ const createPost = async (req: Request, res: Response) => {
     //커뮤니티 상세페이지에서 작성된 post의 list를 갖고오려면 커뮤니티(subs) 라우터에서 해당 커뮤니티를 가져오는 getsubs에서 같이 구현해야한다
   };
 
+  //댓글 리스트 가져오기
+  const getPostComments = async (req: Request, res: Response) => {
+    
+    const { identifier, slug } = req.params; //파라미터를 이용해 주소값 가져오기
+    try {
+      const post = await Post.findOneByOrFail({ identifier, slug }); //관련된 Post정보를 가져온다.
+      const comments = await Comment.find({//댓글을 모두 찾아야하므로 find 후 다른 곳들과 달리 {} 중괄호
+        where: { postId: post.id }, 
+        order: { createdAt: "DESC" }, //내림차순
+        relations: ["votes"], // votes 테이블과 join
+      });
+
+      //투표 부분
+      if (res.locals.user) {
+        comments.forEach((c) => c.setUserVote(res.locals.user));
+      }
+      return res.json(comments);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "문제가 발생했습니다." });
+    }
+  };
+
 const router = Router();
 //post생성 라우터
 router.post("/",userMiddleware,authMiddleware, createPost);
@@ -91,4 +114,6 @@ router.post("/",userMiddleware,authMiddleware, createPost);
 router.get("/:identifier/:slug", userMiddleware, getPost);
 //댓글작성한 내용 DB에 저장하기
 router.post("/:identifier/:slug/comments", userMiddleware, createPostComment);
+//작성한 댓글들 리스트 가져오기
+router.get("/:identifier/:slug/comments", userMiddleware,getPostComments);
 export default router; //이것도 항상 routes의 기능 만들 때 작성

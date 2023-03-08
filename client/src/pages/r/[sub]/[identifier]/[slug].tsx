@@ -11,8 +11,8 @@ import { FormEvent, useState } from "react";
 
 const PostPage = () => {
     const { authenticated, user } = useAuthState(); //댓글 창을 위해 가져옴
-    const [newComment, setNewComment] = useState("");
-
+    const [newComment, setNewComment] = useState(""); //댓글작성텍스트 값 저장
+    
       
     //원래 useSWR은 아래와 같이 사용했다
     //post의 데이터를 가져오기위해 작성
@@ -34,9 +34,25 @@ const PostPage = () => {
     const { identifier, sub, slug } = router.query; //router.query를 통해 현재 post의 경로를 데이터로 가져올 수 있다.
     //현재 클릭한 post정보를 가져온다.
     const { data: post, error, mutate: postMutate } = useSWR<Post>(identifier && slug ? `/posts/${identifier}/${slug}` : null);
+    //post 아래 작성된 댓글들의 댓글 리스트들을 가져온다.
     const { data: comments, mutate: commentMutate } = useSWR<Comment[]>(
         identifier && slug ? `/posts/${identifier}/${slug}/comments` : null
     )
+
+    //댓글 작성버튼 누르면
+    const handleSubmit= async (e:FormEvent)=>{
+        e.preventDefault();
+        if(newComment.trim() === ""){ //값이 없으면 막기
+            return;
+        }
+        try {
+            await axios.post(`/posts/${post?.identifier}/${post?.slug}/comments`,{ //서버으 routes로 comment 핸들러 요청
+                body:newComment //body에 newComment로 설정  
+            });
+        } catch (error) {
+            console.log(error);   
+        }
+    }
     return (
         <div className="flex max-w-5xl px-4 pt-5 mx-auto">
             <div className="w-full md:mr-3 md:w-8/12">
@@ -79,7 +95,7 @@ const PostPage = () => {
                             {/* 댓글 작성 구간 
                             1. 로그인 되어있으면 댓글창이 생김
                             2.username을 클릭하면 유저페이지로 넘어감 `/u/${user.username}`
-                            3.
+                            3.{로그인이 안되어 있다면 아래 표시 
                             */}
                             <div className="pr-6 mb-4 pl-9">
                                 {authenticated ?
@@ -109,7 +125,8 @@ const PostPage = () => {
                                                 </button>
                                             </div>
                                         </form>
-                                    </div>)
+                                    </div>
+                                    )
                                     :
                                     (<div className="flex items-center justify-between px-2 py-4 border border-gray-200 rounded">
                                         <p className="font-semibold text-gray-400">
@@ -126,7 +143,32 @@ const PostPage = () => {
                                 }
                             </div>
                             {/* 댓글 리스트 부분 */}
-                            
+                            {comments?.map(comment => (
+                                <div className="flex" key={comment.identifier}>
+                                    {/* 좋아요 싫어요 기능 부분 */}
+                                    <div className="flex-shrink-0 w-10 py-2 text-center rounded-l">
+                                        
+                                    </div>
+
+                                    <div className="py-2 pr-2">
+                                        <p className="mb-1 text-xs leading-none">
+                                            <Link href={`/u/${comment.username}`}>
+                                                <a className="mr-1 font-bold hover:underline">
+                                                    {comment.username}
+                                                </a>
+                                            </Link>
+                                            <span className="text-gray-600">
+                                                {`
+                                              ${comment.voteScore}
+                                              posts
+                                              ${dayjs(comment.createdAt).format("YYYY-MM-DD HH:mm")}
+                                            `}
+                                            </span>
+                                        </p>
+                                        <p>{comment.body}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </>
                     )}
                 </div>
