@@ -6,6 +6,33 @@ import userMiddleware from "../middlewares/user";
 import authMiddleware from "../middlewares/auth";
 import Post from "../entities/Post";
 import Sub from "../entities/Sub";
+import Comment from "../entities/Comment";
+
+
+const createPostComment = async (req: Request, res: Response) => {
+  const {identifier,slug}=req.params; //경로를 통해 값을 가져옴
+  const body= req.body.body //body에 댓글내용 있음 요청 줄 때 body로 지정해줘서 body.body가 됨
+
+  try {
+    const post = await Post.findOneByOrFail({identifier,slug}); //post안에 comment넣을거니까 무슨 post인지 찾아준다.  
+    const comment= new Comment()//댓글 DB를 갖고와서 댓글 내용과 관련된 유저와 post정보를 저장
+    comment.body = body;
+    comment.user = res.locals.user;
+    comment.post = post;
+
+    //투표 부분
+    if (res.locals.user) {
+      post.setUserVote(res.locals.user);
+    }
+
+    await comment.save();//DB에 저장
+    return res.json(comment);// 클라이언트에 저장된 comment정보 보내기
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({ error: "게시물을 찾을 수 없습니다." });
+  }
+
+}
 
 //현재 클릭한 post가져오는 라우터
 const getPost = async (req: Request, res: Response) => {
@@ -62,4 +89,6 @@ const router = Router();
 router.post("/",userMiddleware,authMiddleware, createPost);
 //현재 클릭한 post정보를 가져오는 라우터
 router.get("/:identifier/:slug", userMiddleware, getPost);
+//댓글작성한 내용 DB에 저장하기
+router.post("/:identifier/:slug/comments", userMiddleware, createPostComment);
 export default router; //이것도 항상 routes의 기능 만들 때 작성
