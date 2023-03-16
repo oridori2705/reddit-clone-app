@@ -47,11 +47,13 @@ export default function App({ Component, pageProps }: AppProps) {
   //<script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" integrity="sha384-rOA1PnstxnOBLzCLMcre8ybwbTmemjzdNlILg8O7z1lUkLXozs4DHonlDtnE7fpc" crossorigin="anonymous"></script> 삽입
   //crossorigin은 JSX에서는 crossOrigin으로 바꿔줘야한다.
   return (
-    <Head >
+    <>
+      <Head>
       <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" integrity="sha384-rOA1PnstxnOBLzCLMcre8ybwbTmemjzdNlILg8O7z1lUkLXozs4DHonlDtnE7fpc" crossOrigin="anonymous"></script>
+      </Head>
       <SWRConfig
       value={{fetcher}}
-    >
+      >
         <AuthProvider>
         {!authRoute && <NavBar/>}
           <div className={authRoute ? "" : "pt-16"}>
@@ -60,8 +62,10 @@ export default function App({ Component, pageProps }: AppProps) {
         
         </AuthProvider>
       </SWRConfig>
+    </>
     
-    </Head>
+    
+    
     
     
   )

@@ -6,8 +6,8 @@ import { Comment, Post } from "../../../../types";
 import dayjs from 'dayjs';
 import { useAuthState } from "../../../../context/auth";
 import { FormEvent, useState } from "react";
-//import classNames from 'classnames';
-//import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import classNames from 'classnames'; //좋아요 싫어요 화살표 아이콘 사용의 조건을 위해 
+import { FaArrowUp, FaArrowDown } from "react-icons/fa"; //npm install react-icons --save 설치
 
 const PostPage = () => {
     const { authenticated, user } = useAuthState(); //댓글 창을 위해 가져옴
@@ -33,11 +33,38 @@ const PostPage = () => {
     const router = useRouter();
     const { identifier, sub, slug } = router.query; //router.query를 통해 현재 post의 경로를 데이터로 가져올 수 있다.
     //현재 클릭한 post정보를 가져온다.
-    const { data: post, error, mutate: postMutate } = useSWR<Post>(identifier && slug ? `/posts/${identifier}/${slug}` : null);
+    const { data: post, error,mutate: postMutate} = useSWR<Post>(identifier && slug ? `/posts/${identifier}/${slug}` : null);
     //post 아래 작성된 댓글들의 댓글 리스트들을 가져온다.
-    const { data: comments, mutate: commentMutate } = useSWR<Comment[]>(
+    const { data: comments,mutate: commentMutate } = useSWR<Comment[]>(
         identifier && slug ? `/posts/${identifier}/${slug}/comments` : null
     )
+    //댓글이든 Post든 투표를 하게되면
+    const vote = async (value: number, comment?:Comment) => {
+        if(!authenticated) router.push("/login"); //로그인이 안되어 있다면 로그인 페이지로
+
+        // 이미 클릭 한 vote 버튼을 눌렀을 시에는 reset
+        if (
+            (!comment && value === post?.userVote) ||//post의 투표 값이 있으면, (post를 무조건 가져오긴하지만 post에 undefined가 뜬다. ?를 줘서 없애자)
+            (comment && comment.userVote === value) //댓글의 투표 값이 있으면
+        ) {
+            value = 0 //value를 0으로 만든다.
+        }
+        
+        try {
+            const res=await axios.post("/votes", {
+                identifier, // 원래는 identifier : identifier인데 생략
+                slug,
+                commentIdentifier: comment?.identifier,
+                value
+            })//현재 response에는 post정보가 넣어져있음
+            postMutate();
+            commentMutate();
+            console.log("res",res);
+        } catch (error) {
+            console.log(error);
+        }
+        
+    }
 
     //댓글 작성버튼 누르면
     const handleSubmit= async (e:FormEvent)=>{
@@ -49,6 +76,8 @@ const PostPage = () => {
             await axios.post(`/posts/${post?.identifier}/${post?.slug}/comments`,{ //서버으 routes로 comment 핸들러 요청
                 body:newComment //body에 newComment로 설정  
             });
+            commentMutate();
+            setNewComment("");
         } catch (error) {
             console.log(error);   
         }
@@ -61,21 +90,44 @@ const PostPage = () => {
                         <>
                             <div className="flex">
                                 {/* 좋아요 싫어요 기능 부분 */}
-                                
+                                <div className="flex-shrink-0 w-10 py-2 text-center rounded-l">
+                                    {/* 좋아요 onClick={() => vote(1) 클릭했을 때 1을 올려줌 */ }
+                                    <div
+                                        className="flex justify-center w-6 mx-auto text-gray-400 rounded cursor-pointer hover:bg-gray-300 hover:text-red-500"
+                                        onClick={() => vote(1)}
+                                    >
+                                        {post.userVote === 1 ?
+                                            <FaArrowUp className="text-red-500" />
+                                            : <FaArrowUp />
+                                        }
+                                    </div>
+                                    {/*총 투표 수 */}
+                                    <p className="text-xs font-bold">{post.voteScore}</p>
+                                    {/* 싫어요 */}
+                                    <div
+                                        className="flex justify-center w-6 mx-auto text-gray-400 rounded cursor-pointer hover:bg-gray-300 hover:text-blue-500"
+                                        onClick={() => vote(-1)}
+                                    >
+                                        {post.userVote === -1 ?
+                                            <FaArrowDown className="text-blue-500" />
+                                            : <FaArrowDown />
+                                        }
+                                    </div>
+                                </div>
                                 <div className="py-2 pr-2">
                                     <div className="flex items-center">
                                         <p className="text-xs test-gray-400">
-                                            Posted by                     <i className="fas fa-abacus"></i>
+                                            Posted by<i className="fas fa-abacus"></i>
 
                                             <Link href={`/u/${post.username}`}>
-                                                <a className="mx-1 hover:underline">
+                                                <p className="mx-1 hover:underline">
                                                     /u/{post.username}
-                                                </a>
+                                                </p>
                                             </Link>
                                             <Link href={post.url}>
-                                                <a className="mx-1 hover:underline">
+                                                <p className="mx-1 hover:underline">
                                                     {dayjs(post.createdAt).format("YYYY-MM-DD HH:mm")}
-                                                </a>
+                                                </p>
                                             </Link>
                                         </p>
                                     </div>
@@ -102,9 +154,9 @@ const PostPage = () => {
                                     (<div>
                                         <p className="mb-1 text-xs">
                                             <Link href={`/u/${user?.username}`}>
-                                                <a className="font-semibold text-blue-500">
+                                                <p className="font-semibold text-blue-500">
                                                     {user?.username}
-                                                </a>
+                                                </p>
                                             </Link>
                                             {" "}으로 댓글 작성
                                         </p>
@@ -134,9 +186,9 @@ const PostPage = () => {
                                         </p>
                                         <div>
                                             <Link href={`/login`}>
-                                                <a className="px-3 py-1 text-white bg-gray-400 rounded">
+                                                <p className="px-3 py-1 text-white bg-gray-400 rounded">
                                                     로그인
-                                                </a>
+                                                </p>
                                             </Link>
                                         </div>
                                     </div>)
@@ -145,17 +197,37 @@ const PostPage = () => {
                             {/* 댓글 리스트 부분 */}
                             {comments?.map(comment => (
                                 <div className="flex" key={comment.identifier}>
-                                    {/* 좋아요 싫어요 기능 부분 */}
-                                    <div className="flex-shrink-0 w-10 py-2 text-center rounded-l">
-                                        
+                                     {/* 좋아요 싫어요 기능 부분 post 투표와 다른점은 vote(1,comment)를 추가했다.*/}
+                                     <div className="flex-shrink-0 w-10 py-2 text-center rounded-l">
+                                        {/* 좋아요 */}
+                                        <div
+                                            className="flex justify-center w-6 mx-auto text-gray-400 rounded cursor-pointer hover:bg-gray-300 hover:text-red-500"
+                                            onClick={() => vote(1, comment)}
+                                        >
+                                            {comment.userVote === 1 ? //post의 uservote는 엔티티에서 미리 검사해서 해당 댓글의 투표한 사람이 현재 사용자인지 체크해서 그 값을 저장했다.
+                                                <FaArrowUp className="text-red-500" />
+                                                : <FaArrowUp />
+                                            }
+                                        </div>
+                                        <p className="text-xs font-bold">{comment.voteScore}</p>
+                                        {/* 싫어요 */}
+                                        <div
+                                            className="flex justify-center w-6 mx-auto text-gray-400 rounded cursor-pointer hover:bg-gray-300 hover:text-blue-500"
+                                            onClick={() => vote(-1, comment)}
+                                        >
+                                            {comment.userVote === -1 ?
+                                                <FaArrowDown className="text-red-500" />
+                                                : <FaArrowDown />
+                                            }
+                                        </div>
                                     </div>
 
                                     <div className="py-2 pr-2">
                                         <p className="mb-1 text-xs leading-none">
                                             <Link href={`/u/${comment.username}`}>
-                                                <a className="mr-1 font-bold hover:underline">
+                                                <p className="mr-1 font-bold hover:underline">
                                                     {comment.username}
-                                                </a>
+                                                </p>
                                             </Link>
                                             <span className="text-gray-600">
                                                 {`

@@ -24,6 +24,7 @@ import cookieParser from "cookie-parser";
 
 import postsRoutes from "./routes/posts"//포스트 작성 routes
 
+import votesRoutes from "./routes/votes";//votes.ts 사용할수 잇도록
 
 const app = express(); //express는 최상위함수니까 app으로 만듦
 
@@ -66,6 +67,7 @@ app.use("/api/subs",subRoutes)
 
 app.use("/api/posts",postsRoutes)//post작성 routes
 
+app.use("/api/votes",votesRoutes); //votes routes 갈 수 잇도록
 //포트를 지정해주고 app.listen을 실행해주면 express app을 실행해주는 것이다.
 app.listen(port, async ()=> {
     AppDataSource.initialize().then( () => {

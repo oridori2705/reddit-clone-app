@@ -24,14 +24,14 @@ const SubPage = () => {
         setOwnSub(authenticated && user.username === sub.username); // 로그인이 되어있고 && 현재  사용자와 커뮤니티 주인이 같으면 OwnSun true 설정
     }, [sub]) //sub이 바뀔때마다
 
-    console.log('sub', sub);
+    
 
 
     const uploadImage = async (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files === null) return;// 파일이 null이면 진행하지 못하게
 
         const file = event.target.files[0];//
-        console.log('file', file);
+       
 
         //파일은 백엔드에 보내기전에 FormData에 넣어줘야한다.
         const formData = new FormData();
@@ -124,9 +124,9 @@ const SubPage = () => {
                     </div>
                     {/* 포스트와 사이드바 */}
                     <div className='flex max-w-5xl px-4 pt-5 mx-auto'>
-                        <div className='w-full md:mr-3 md:w-8/12'>
+                        <div className='w-full md:mr-3 md:w-8/12'/>
                             <SideBar sub={sub}/>                    
-                        </div>
+                        
                     </div>
                 </>
             }

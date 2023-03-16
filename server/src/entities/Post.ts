@@ -65,11 +65,12 @@ export default class Post extends BaseEntity {
         return this.votes?.reduce((memo, curt) => memo + (curt.value || 0), 0); //투표가 몇명이 올리고 내렷는지의 합 curt.value가 없을 경우 0으로 방어코드
     }
 
-    protected userVote: number;
+    protected userVote: number; //
     
     setUserVote(user: User) {
-        const index = this.votes?.findIndex(v => v.username === user.username);
-        this.userVote = index > -1 ? this.votes[index].value : 0;
+        const index = this.votes?.findIndex(v => v.username === user.username);//투표 DB에 지금 현재사용자의 아이디로 된 POST 투표가 있는지 찾는다.
+        this.userVote = index > -1 ? this.votes[index].value : 0; //있으면 그 index의 value(좋아요를 했는지 싫어요를 했는지)를 갖고와서 간단하게 userVote에 저장한다. 
+        //만약 좋아요버튼을 클릭했을 경우 프론트에서 좋아요 버튼을 활성화(좋아요 했다는 표시) 시켜줘야하기 때문에
     }
     //다른 소스 이용함 ->helpers.ts
     @BeforeInsert()

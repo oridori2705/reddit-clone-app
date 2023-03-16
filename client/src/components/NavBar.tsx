@@ -53,7 +53,7 @@ const NavBar: React.FC = () => {
                                 로그인
                             </p>
                         </Link>
-                        <Link href="/register">
+                        <Link href="/Register">
                             <p className="w-20 px-2 pt-1 text-sm text-center text-white bg-gray-400 rounded h-7">
                                 회원가입
                             </p>

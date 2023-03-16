@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         authenticated: false,
         loading: true
     })
-    console.log(state)
+    
     //유저의 정보를 업데이트하거나 인증유무를 업데이트 하는 부분
     const dispatch = (type: string, payload?: any) => {
         defaultDispatch({ type, payload });

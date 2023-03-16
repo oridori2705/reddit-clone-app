@@ -32,12 +32,12 @@ export default class Comment extends BaseEntity {
     @OneToMany(() => Vote, (vote) => vote.comment)
     votes: Vote[]
 
-    protected userVote: number;
+    protected userVote: number; //이 데이터로 좋아요버튼이 활성화 되어있는지 싫어요 버튼이 활성화 되어 있는지 확인한다.
     //findIndex : 원하는 요소를 찾으면 인덱스를 반환하고 바로 메소드를 종료함, 없으면 -1반환
     setUserVote(user: User) {
-        const index = this.votes?.findIndex(v => v.username === user.username);
-        this.userVote = index > -1 ? this.votes[index].value : 0;  //만약 투표한 데이터가 있으면 해당 value 반환(value는 1아니면 -1)
-    }
+        const index = this.votes?.findIndex(v => v.username === user.username);//Post와 마찬가지로 Vote DB에서 현재 사용자가 투표한 댓글이 있는지 찾는다.
+        this.userVote = index > -1 ? this.votes[index].value : 0;  //만약 투표한 데이터가 있으면 해당 value 반환(value는 1아니면 -1)-> 좋아요를 했는지 싫어요를 했는지 프론트에서 체크하기 위해
+    }//Post와 다른점은 comments는 여러개이므로 route/votes에서 foreach로 현재 사용자의 데이터를 모든 댓글에 보내서 userVote의 값을 설정하였다.
 
     @Expose() get voteScore(): number { //총 투표한 숫자
         const initialValue = 0; //총 투표한 숫자 초기화 값

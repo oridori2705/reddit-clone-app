@@ -85,7 +85,7 @@ const login = async(req: Request, res: Response) =>{
     })); //특별한 경우가 아니라면, path 옵션을 path=/ 같이 루트로 설정해 웹사이트의 모든 페이지에서 쿠키에 접근할 수 있도록 합시다.
     
     //user랑 토큰을 요청을 보내온곳에 다시 보내준다.
-    console.log(res)
+    
     return res.json({ user, token });
     } catch (error) {
       console.error(error);

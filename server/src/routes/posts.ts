@@ -86,7 +86,6 @@ const createPost = async (req: Request, res: Response) => {
 
   //댓글 리스트 가져오기
   const getPostComments = async (req: Request, res: Response) => {
-    
     const { identifier, slug } = req.params; //파라미터를 이용해 주소값 가져오기
     try {
       const post = await Post.findOneByOrFail({ identifier, slug }); //관련된 Post정보를 가져온다.
