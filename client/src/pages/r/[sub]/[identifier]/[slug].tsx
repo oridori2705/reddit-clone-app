@@ -87,7 +87,7 @@ const PostPage = () => {
             <div className="w-full md:mr-3 md:w-8/12">
                 <div className="bg-white rounded">
                     {post && (
-                        <>
+                        <div>
                             <div className="flex">
                                 {/* 좋아요 싫어요 기능 부분 */}
                                 <div className="flex-shrink-0 w-10 py-2 text-center rounded-l">
@@ -204,7 +204,7 @@ const PostPage = () => {
                                             className="flex justify-center w-6 mx-auto text-gray-400 rounded cursor-pointer hover:bg-gray-300 hover:text-red-500"
                                             onClick={() => vote(1, comment)}
                                         >
-                                            {comment.userVote === 1 ? //post의 uservote는 엔티티에서 미리 검사해서 해당 댓글의 투표한 사람이 현재 사용자인지 체크해서 그 값을 저장했다.
+                                            {comment.userVote === 1 ?
                                                 <FaArrowUp className="text-red-500" />
                                                 : <FaArrowUp />
                                             }
@@ -234,14 +234,14 @@ const PostPage = () => {
                                               ${comment.voteScore}
                                               posts
                                               ${dayjs(comment.createdAt).format("YYYY-MM-DD HH:mm")}
-                                            `}
+ `}
                                             </span>
                                         </p>
                                         <p>{comment.body}</p>
                                     </div>
                                 </div>
                             ))}
-                        </>
+                        </div>
                     )}
                 </div>
             </div>

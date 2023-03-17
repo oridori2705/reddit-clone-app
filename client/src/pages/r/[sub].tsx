@@ -1,4 +1,6 @@
+import PostCard from '@/components/PostCard';
 import SideBar from '@/components/SideBar';
+import { Post, Sub } from '@/types';
 import axios from 'axios'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -16,7 +18,7 @@ const SubPage = () => {
     
     const router = useRouter();
     const subName = router.query.sub; //요청을 불러올 주소를 현재 라우터를 통해 저장,sub은 현재 url 이름, 만약 커뮤니티 이름이 test2면 test2를 가져옴
-    const { data: sub} = useSWR(subName ? `/subs/${subName}` : null); //useSWR을 통해 서버에 데이터 요청,fetcher 없앰 _app.tsx에 선언
+    const { data: sub, mutate} = useSWR(subName ? `/subs/${subName}` : null); //useSWR을 통해 서버에 데이터 요청,fetcher 없앰 _app.tsx에 선언
     
     
     useEffect(() => {
@@ -58,17 +60,19 @@ const SubPage = () => {
         }
     }
 
-    // let renderPosts;
-    // if (!sub) {
-    //     renderPosts = <p className="text-lg text-center">로딩중...</p>
-    // } else if (sub.posts.length === 0) {
-    //     renderPosts = <p className="text-lg text-center">아직 작성된 포스트가 없습니다.</p>
-    // } else {
-    //     renderPosts = sub.posts.map((post: Post) => (
-    //         <PostCard key={post.identifier} post={post} subMutate={mutate} />
-    //     ))
-    // }
-    // console.log('sub.imageUrl', sub?.imageUrl)
+    let renderPosts; //만약 Post를 못가져오는경우(로딩), Post가 없는경우, Post가 있는 경우를 위해 분기점 작성
+    if (!sub) {
+        renderPosts = <p className="text-lg text-center">로딩중...</p>
+    } else if (sub.posts.length === 0) {
+        renderPosts = <p className="text-lg text-center">아직 작성된 포스트가 없습니다.</p>
+    } else {
+        //커뮤니티(sub)에있는 Post배열을 map으로 나열하고 각각 post에 해당 post값과 mutate값을 PostCard에 Props해준다
+        renderPosts = sub.posts.map((post: Post) => (
+            //ket값은 유일한 값으로 설정해준다.
+            <PostCard key={post.identifier} post={post} subMutate={mutate} />
+        ))
+    }
+    console.log('sub.imageUrl', sub?.imageUrl)
     return (
         <>
             {sub &&
@@ -124,7 +128,7 @@ const SubPage = () => {
                     </div>
                     {/* 포스트와 사이드바 */}
                     <div className='flex max-w-5xl px-4 pt-5 mx-auto'>
-                        <div className='w-full md:mr-3 md:w-8/12'/>
+                        <div className="w-full md:mr-3 md:w-8/12">{renderPosts} </div>
                             <SideBar sub={sub}/>                    
                         
                     </div>
