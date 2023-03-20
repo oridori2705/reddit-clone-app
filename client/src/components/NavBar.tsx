@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import Link from "next/link"
+import { FaSearch } from "react-icons/fa";
 import { useAuthDispatch, useAuthState } from "../context/auth"
 
 const NavBar: React.FC = () => {
@@ -22,7 +23,7 @@ const NavBar: React.FC = () => {
     }
 
     return (
-        <div className="fixed inset-x-0 top-0 z-10 flex items-center justify-between px-5 bg-white h-13">
+        <div className="fixed inset-x-0 top-0 z-10 flex items-center justify-between px-5 bg-white h-16">
             <span className="text-2xl font-semibold text-gray-400">
                 <Link href="/">
                     Community
@@ -30,9 +31,10 @@ const NavBar: React.FC = () => {
             </span>
             <div className="max-w-full px-4">
                 <div className="relative flex items-center bg-gray-100 border rounded hover:border-gray-700 hover:bg-white">
+                    <FaSearch className="ml-2 text-gray-400"/>
                     <input
                         type="text"
-                        placeholder="Search Reddit"
+                        placeholder="Search..."
                         className="px-3 py-1 bg-transparent rounded h-7 focus:outline-none"
                     />
                 </div>

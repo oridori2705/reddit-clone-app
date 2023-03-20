@@ -56,7 +56,7 @@ export default function App({ Component, pageProps }: AppProps) {
       >
         <AuthProvider>
         {!authRoute && <NavBar/>}
-          <div className={authRoute ? "" : "pt-16"}>
+          <div className={authRoute ? "" : "pt-12 bg-gray-200 min-h-screen"}>
             <Component {...pageProps} />
           </div>
         

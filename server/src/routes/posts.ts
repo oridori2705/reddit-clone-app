@@ -8,6 +8,31 @@ import Post from "../entities/Post";
 import Sub from "../entities/Sub";
 import Comment from "../entities/Comment";
 
+//메인페이지 Post 나열하기
+const getPosts = async(req: Request, res: Response) => {
+  //return `/posts?page=${pageIndex}` 에서 req.query를 이용해 page값을 가져온다. 없으면 0
+  const currentPage: number = (req.query.page || 0) as number;
+  //req.quert.count는 요청url에 없기 때문에 계속 8이다.
+  const perPage: number = (req.query.count || 8) as number;
+
+  try {
+    const posts = await Post.find({
+      order: {createdAt: "DESC"},
+      relations: ["sub", "votes", "comments"],
+      skip: currentPage * perPage, //skip은 값이 8이면 8개를 스킵하고 그 다음 배열을 가져온다.
+      take: perPage //가져올 배열의 갯수
+    })
+    //userMiddleware를 이용해 현재 로그인한 유저정보를 가져오고 그 유저정보를 이용해 나열한 post에 현재 유저가 투표한 post를 표시해준다.
+    if(res.locals.user) {
+      posts.forEach(p => p.setUserVote(res.locals.user)); 
+    }
+
+    return res.json(posts);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "문제가 발생했습니다."});
+  }
+}
 
 const createPostComment = async (req: Request, res: Response) => {
   const {identifier,slug}=req.params; //경로를 통해 값을 가져옴
@@ -115,4 +140,6 @@ router.get("/:identifier/:slug", userMiddleware, getPost);
 router.post("/:identifier/:slug/comments", userMiddleware, createPostComment);
 //작성한 댓글들 리스트 가져오기
 router.get("/:identifier/:slug/comments", userMiddleware,getPostComments);
+//메인페이지 Post 나열하기
+router.get("/", userMiddleware, getPosts);
 export default router; //이것도 항상 routes의 기능 만들 때 작성

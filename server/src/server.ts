@@ -12,6 +12,7 @@ import express from "express";
 import morgan from "morgan";
 import { AppDataSource } from "./data-source"
 
+import usersRoutes from "./routes/users";//유저정보페이지
 
 import authRoutes from "./routes/auth"// auth로 가기위한 경로 지정
 
@@ -68,6 +69,9 @@ app.use("/api/subs",subRoutes)
 app.use("/api/posts",postsRoutes)//post작성 routes
 
 app.use("/api/votes",votesRoutes); //votes routes 갈 수 잇도록
+
+app.use("/api/users",usersRoutes); //users routes로 갈 수 있도록
+
 //포트를 지정해주고 app.listen을 실행해주면 express app을 실행해주는 것이다.
 app.listen(port, async ()=> {
     AppDataSource.initialize().then( () => {

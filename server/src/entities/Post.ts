@@ -1,6 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { makeId, slugify } from '../utils/helpers';
+import { makeId } from '../utils/helpers';
+import {slugify} from "transliteration";
 import Comment from './Comment';
 import BaseEntity from './Entity'; //Entity파일을 상속
 import Sub from './Sub';
@@ -62,7 +63,8 @@ export default class Post extends BaseEntity {
     }
 
     @Expose() get voteScore(): number {
-        return this.votes?.reduce((memo, curt) => memo + (curt.value || 0), 0); //투표가 몇명이 올리고 내렷는지의 합 curt.value가 없을 경우 0으로 방어코드
+        //투표가 몇명이 올리고 내렷는지의 합 curt.value가 없을 경우 0으로 방어코드
+        return this.votes?.reduce((memo, curt) => memo + (curt.value || 0), 0); 
     }
 
     protected userVote: number; //
